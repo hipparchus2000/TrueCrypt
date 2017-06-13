@@ -1,0 +1,125 @@
+How to use TRUSTKEY demo implementation:
+
+Future:
+the idea is that the team (me = Jeff Davies) will make a microcontroller or similar small micro based PDA type device with a serial port (or usb), a small screen and a qwerty keyboard.
+A small shim peice of software runs on linux or windows to facilitate easy transfer of the block of data the message is hidden in in and out of outlook or KMail (etc).
+
+The device itself imports keys from a Compact Flash chip/card sent through the mail. The keys are One Time Pad type keys, which are thrown away after use.
+
+The device can create a set of keys on a CF for you to send to the other party (or give at an appropriate time).
+
+These CF cards should be updated on regular occaisions: you never know who has gained physical access to the device.
+With OTP, trust can immediately be re-established by throwing away old keys, getting new ones.
+
+The device will be as simple as possible with the simplest 8 bit CPU, and as little code as possible.
+
+THIS CODE IS A SIMULATION OF THE CODE THAT WILL RUN ON THE TRUSTKEY
+but it is in fact a totally working OTP on steroids as of 6.10.04.
+The only thing that is lacking is a variety of options over random number generation (algorithm, or configurable interconnected random number generators).
+
+TO RUN:
+=======
+MAKING KEYS
+-----------
+keys are stored in ./keys
+a unique random name is assigned each time. The directory contains 5 files 
+   dictionary.txt,        list of words and characters for use in your message 
+			  EDITED BY USER in crypt base directory, once a copy
+			  is in a key subdirectory, don't change it.
+   key.txt,               this controls maximum size of dictionary, and block
+                          of random data that the message is hidden in.
+			  EDITED BY USER in crypt base directory, once a copy
+			  is in a key subdirectory, don't change it.
+   message_positions.txt, made by keygen - where in block message will be hidden
+   message_offsets.txt,   made by keygen - random numbers to add to dictionary
+			  index entries before hiding in random block. 
+   dictionary_index.txt   made by keygen - randomises dictionary virtually.
+
+
+COMMAND TO ENTER:
+./makekey.sh
+
+(to make 100 keys at a time)
+./make100keys.sh
+
+* NOTE: also copies the keys to ./rxkeys (ultimately this would be a flash card given to the other party that you're sending encrypted messages to).
+
+
+USING KEYS TO ENCRYPT A MESSAGE
+===============================
+To minimise likelyhood of a message being broken, you should have as little redundancy as possible: as little extraneous text as possible, and as little repetition as possible.
+
+For example "THE COWS ARE BLEATING".
+In this case, pattern recognition programs can find "THE" repeated through a text far more easily than if a dictionary is used to convert the words to numbers eg: 1225,34,21,998.
+
+In this way, you can make your own language with a structure more like the efficiency of Latin, or Russian over the redundancy typically used in English:
+
+instead of having dictionary entries like THE, FOR, 
+you can make simpler language constructs
+THIS-IS HOUSE    (where THIS-IS is a single word in the dictionary)
+
+Setting Key.Txt
+===============
+Edit the copy in the crypt directory, not in keys that have already been made.
+
+This has three numeric entries representing:
+  maximum dictionary size
+  maximum message size
+  block size (size of random block the data is hidden in).
+
+In general it's a good thing to make the dictionary and message size a little larger than required (I guess), and the block size as large as possible.
+Although I'm prepared to be contradicted on all of these points.
+
+Currently, the sizes are not tailored for compression into a binary format,they will be in the final implementation of course.
+
+Editing the Dictionary
+----------------------
+Edit the copy in the crypt directory, not in keys that have already been made.
+Enter one word per line (one word can be SEE-YOU-LATER-ALLIGATOR).
+Do not have whitespace on a line.
+
+Editing the message
+------------------
+ Edit {crypt directory}/message.txt
+
+Enter one word (from the dictionary) per line.
+If the word is not currently in the dictionary, then the encrypt program will complain.
+
+Currently I use a single hyphen as the first word in the Dictionary, and pad the message out beyond say 50 lines using one-hyphen-to-an-unused-line (the scripts ignore lines containing a single hyphen when printing out messages).
+
+ENCRYPTING THE MESSAGE
+======================
+first list all the keys that have been made:
+./listkeys.sh
+
+choose one, and use the name in this following command line:
+./encrypt.sh QtYUip234
+
+(where the gobbledegook QtYUip234 is the key name).
+
+the key you just used has been deleted from keys.
+
+A copy is still in ./rxkeys
+Ultimately, the key wouldn't still be on the local machine, but on the other person's TRUSTKEY PDA.
+
+The message is copied and pasted from ./messages (you can see it with the ./listmessages.sh command).
+
+DECRYPTING THE MESSAGE
+======================
+Other party has sent you a message. The message is called the keyname.
+The key is resident in your ./rxkeys directory.
+
+The command to enter is:
+
+./decrypt.sh TtYi234q
+where TtYi234q is the message (and rxkeys key) name.
+
+the command prints out the message text, (you can read it again in ./message-out.txt) and deletes the used key from rxkeys.
+
+Enjoy using it!
+
+(c) Jeff Davies
+www.aliensarehere.com  2004. 
+
+
+

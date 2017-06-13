@@ -1,0 +1,14 @@
+currently i'm running the TRUSTKEY software on a FreeBSD 5.2.1 system 
+I originally wrote the algorithms in yabsic, and now I've ported them
+to GNU C++.
+
+(yabasic that I used is in ./3rdParty).
+
+yabasic was used orignally because I might use a PIC controller in a TRUSTKEY 
+PDA , and a Basic compiler is easy to get.
+
+Hardware I'm using is X86 (A Pentium 200 with 64 meg of RAM that I got for Free!).
+
+(c) Jeff Davies
+2004
+

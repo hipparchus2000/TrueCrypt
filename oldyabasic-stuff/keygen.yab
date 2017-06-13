@@ -1,0 +1,105 @@
+
+rem
+rem Copyright (c) 2004, Jeff Davies (editor@aliensarehere.com) 
+rem  
+rem You may distribute under the terms of the GNU General Public License as
+rem specified in the licence file that comes with the TRUSTKEY source 
+rem distribution.
+rem 
+rem 
+
+open "key.txt" for reading as 1
+input#1 dict_max
+input#1 msg_max
+input#1 block_size
+close 1
+
+rem dict_max=100
+rem msg_max=50
+rem block_size=10000
+
+dim dictionary$(dict_max)
+dim dictionary_index(dict_max)
+dim dictionary_flag(dict_max)
+dim message(msg_max)
+
+rem debug code
+dbg=0
+dbg1=0
+
+rem set dbg to d_di to debug dictionary index generation
+d_di=1
+d_vb=2
+
+if (dbg1=d_vb) print "keygen starting"
+
+rem set to 1 to use offsets
+uo=1
+
+if (dbg1=d_vb) print "resetting dictionary flags"
+for i=0 to (dict_max-1)
+   dictionary_flag(i)=-1
+next i
+
+if (dbg1=d_vb) print "filling dictionary index"
+for i=0 to (dict_max-1)
+    if (dbg=d_di) print i
+    repeat 
+       	pval=int(ran(1)*dict_max)
+	if(dbg=d_di) print "trying ",pval
+    until (dictionary_flag(pval)=-1 )
+    if (dbg=d_di) print "using index",pval,"for entry",i 
+    dictionary_index(i)=pval
+    dictionary_flag(pval)=0
+next i
+
+if (dbg1=d_vb) print "reading dictionary.txt"
+open "dictionary.txt" for reading as 1
+count=0
+while (not (eof (1)) and (count <(dict_max-1))) 
+    input #1 dictionary$(count)
+    count=count+1
+wend
+close 1
+if (dbg1=d_vb) print "read ",count,"records from dictionary"
+
+if (dbg1=d_vb) print "writing dictionary index to file"
+open "dictionary_index.txt" for writing as 1
+for i=0 to (dict_max-1)
+	print#1, dictionary_index(i)
+next i
+close 1
+
+dim message_positions(msg_max)
+dim message_offsets(msg_max)
+
+if (dbg1=d_vb) print "making random offsets"
+rem fill random offsets
+for i=0 to (msg_max-1)
+	message_offsets(i)=int(ran(1)*dict_max)
+next i 
+
+if (dbg1=d_vb) print "saving offsets"
+rem save random offsets
+open "message_offsets.txt" for writing as 1
+for i=0 to (msg_max-1)
+    print#1, message_offsets(i)
+next i
+close 1
+
+if (dbg1=d_vb) print "making random positions - assigning positions"
+for i=0 to (msg_max-1) 
+     message_positions(i)=int(ran(1)*block_size)
+next i
+
+if (dbg1=d_vb) print "writing positions file"
+open "message_positions.txt" for writing as 1
+rem save random positions
+for i=0 to (msg_max-1)
+	print#1, message_positions(i)
+next i
+close 1
+
+
+
+
